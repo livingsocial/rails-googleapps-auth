@@ -1,7 +1,5 @@
 require 'openid'
-require 'openid/store/memcache'
 require 'openid/store/memory'
-require 'openid/store/filesystem'
 require 'openid/extensions/ax'
 
 
@@ -14,7 +12,6 @@ module GoogleAppsAuth
     :lastname => "http://axschema.org/namePerson/last",
     :language => "http://axschema.org/pref/language"
   }
-
 
   class Result
     attr_reader :error
@@ -47,12 +44,12 @@ module GoogleAppsAuth
   def google_apps_authenticate(appname, return_action = 'finish', get_attrs = nil)
     get_attrs ||= []
     begin
-      oidreq = consumer.begin GoogleAppsOIDAuth::ID_PREFIX + appname
+      oidreq = consumer.begin GoogleAppsAuth::ID_PREFIX + appname
       return_to = url_for :action => return_action, :only_path => false
       realm = request.protocol + request.host_with_port
       ax = OpenID::AX::FetchRequest.new
       get_attrs.each { |attr|
-        ax.add OpenID::AX::AttrInfo.new(GoogleAppsOIDAuth::AX_SCHEMAS[attr], attr.to_s, true)
+        ax.add OpenID::AX::AttrInfo.new(GoogleAppsAuth::AX_SCHEMAS[attr], attr.to_s, true)
       }
       oidreq.add_extension(ax)
       redirect_to oidreq.redirect_url(realm, return_to, false)
@@ -76,7 +73,7 @@ module GoogleAppsAuth
     when OpenID::Consumer::SUCCESS
       resp = OpenID::AX::FetchResponse.from_success_response(oidresp)
       attrs = {}
-      GoogleAppsOIDAuth::AX_SCHEMAS.each { |name,schema| 
+      GoogleAppsAuth::AX_SCHEMAS.each { |name,schema| 
         attrs[name] = resp.data[schema] if not resp.data[schema].nil?
       }
       GoogleAppsAuth::Result.new :success, nil, attrs
@@ -88,14 +85,9 @@ module GoogleAppsAuth
 
   private
   def consumer
-    if @consumer.nil?
-      #store = OpenID::Store::Memcache.new(CACHE)
-      store = OpenID::Store::Memory.new
-      @consumer = OpenID::Consumer.new(session, store)
-    end
-    return @consumer
+    @@store ||= OpenID::Store::Memory.new
+    @consumer ||= OpenID::Consumer.new(session, @@store) 
   end  
-
 
   ## TemplateURI's are not followed by the openid gem - so we have to trick it
   class OpenID::Consumer::IdResHandler

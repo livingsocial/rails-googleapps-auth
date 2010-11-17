@@ -1,43 +1,61 @@
 # Rails-GoogleApps-Auth
-rails-googleapps-auth is a Rails plugin for OpenID auth against Google apps for your domain accounts.
+rails-googleapps-auth is a Rails plugin for OpenID auth against Google apps for your domain accounts.  There are a few unique issues
+when dealing with authenticating against Google's Apps-For-Your-Domain accounts, which is why this plugin was created (instead of using 
+[a more general plugin][open_id_authentication]).  
 
 # Usage
 ## Installation 
-First, install https://github.com/openid/ruby-openid :
-{% highlight bash %}
-gem install openid
-{% endhighlight %}
+First, install https://github.com/openid/ruby-openid:
+       gem install openid
+
 
 Then, checkout this repo into your vendors/plugins dir:
-{% highlight bash %}
-git clone git://github.com/livingsocial/rails-googleapps-auth.git vendors/plugins/rails-googleapps-auth
-{% endhighlight %}
+      git clone git://github.com/livingsocial/rails-googleapps-auth.git vendors/plugins/rails-googleapps-auth
+
 
 ## Authenticating Users
 Create a new controller.
-{% highlight ruby %}
-class OpenidController < ApplicationController
-  def login
-    # user will immediately be redirected to google to log in
-    google_apps_authenticate "hungrymachine.com", 'finish', [:email]
-  end
+       class AuthController < ApplicationController
+           def login
+	       # user will immediately be redirected to google to log in.
+	       # args are 1) your domain, 2) your "finish" controller action, and 
+	       # 3) any required ax params (email/firstname/lastname/language)
+	       google_apps_authenticate "hungrymachine.com", 'finish', [:email]
+	   end
 
-  def finish
-    response = google_apps_handle_auth
-    if response.failed? or response.canceled?
-      render :text => response.error
-    else
-      # start a session, log user in
-      render :text => "Hello, #{response[:email]}"
-    end
-  end
-end
-{% endhighlight %}
+	   def finish
+	       response = google_apps_handle_auth
+	       if response.failed? or response.canceled?
+	           flash[:notice] = "Could not authenticate: #{response.error}"
+	       else   
+	          # start a session, log user in
+		  sessoin[:logged_in] = true
+		  session[:email] = response[:email]
+	       end
+	       redirect_to :root_url
+           end
+       end
 
+To log users in, just redirect them to your controller's **login** action.  Additionally, you will need to 
+add routes for your two actions in your *config/routes.rb* file:
+     map.resources :auth, :collection => { :login => :get, :finish => :get }
+
+Additionally, a memory store is used by default, but if you will have many users authenticating you should use a different 
+**OpenID::Store** by adding the following to your controller:
+       require 'openid/store/memory'
+       self.store = OpenID::Store::Memcache.new(MemCache.new(<your memcache params>))
+       # or
+       require 'openid/store/filesystem'
+       self.store = OpenID::Store::Filesystem.new(Rails.root.join('tmp/openids'))
+                   
 
 # Further Reading
-http://groups.google.com/group/google-federated-login-api/web/openid-discovery-for-hosted-domains
-http://code.google.com/apis/accounts/docs/OpenID.html
+ * [Google's docs on OpenID discovery for hosted domains](http://groups.google.com/group/google-federated-login-api/web/openid-discovery-for-hosted-domains)
+ * [Google's docs on OpenID for general accounts](http://code.google.com/apis/accounts/docs/OpenID.html)
+
 
 # Alternative
-https://github.com/rails/open_id_authentication
+An alternative to this module is the full [open_id_authentication plugin][open_id_authentication], which may
+be useful if you plan to authenticate against other identity providers than Google.
+
+[opend_id_authentication]: https://github.com/rails/open_id_authentication
