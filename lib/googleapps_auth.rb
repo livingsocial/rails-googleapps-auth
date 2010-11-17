@@ -1,5 +1,7 @@
 require 'openid'
 require 'openid/store/memcache'
+require 'openid/store/memory'
+require 'openid/store/filesystem'
 require 'openid/extensions/ax'
 
 
@@ -87,7 +89,8 @@ module GoogleAppsAuth
   private
   def consumer
     if @consumer.nil?
-      store = OpenID::Store::Memcache.new(CACHE)
+      #store = OpenID::Store::Memcache.new(CACHE)
+      store = OpenID::Store::Memory.new
       @consumer = OpenID::Consumer.new(session, store)
     end
     return @consumer
