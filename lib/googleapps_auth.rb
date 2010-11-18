@@ -2,7 +2,6 @@ require 'openid'
 require 'openid/store/memory'
 require 'openid/extensions/ax'
 
-
 module GoogleAppsAuth
   ID_PREFIX = "https://www.google.com/accounts/o8/site-xrds?hd="
   XRDS_PREFIX = "https://www.google.com/accounts/o8/user-xrds?uri="
@@ -82,23 +81,26 @@ module GoogleAppsAuth
     end
   end
 
-
-  private
-  def consumer
-    @@store ||= OpenID::Store::Memory.new
-    @consumer ||= OpenID::Consumer.new(session, @@store) 
-  end  
-
-  ## TemplateURI's are not followed by the openid gem - so we have to trick it
-  class OpenID::Consumer::IdResHandler
-    def verify_discovery_results
-      oldid = @message.get_arg(OpenID::OPENID_NS, 'identity', nil)
-      @message.set_arg(OpenID::OPENID_NS, 'identity', GoogleAppsAuth::XRDS_PREFIX + oldid)
-      @message.set_arg(OpenID::OPENID_NS, 'claimed_id', GoogleAppsAuth::XRDS_PREFIX + oldid)
-      verify_discovery_results_openid2
-      @message.set_arg(OpenID::OPENID_NS, 'identity', oldid)
-      @message.set_arg(OpenID::OPENID_NS, 'claimed_id', oldid)
-    end
+  def store
+    OpenID::Store::Memory.new
   end
- 
+
+  def consumer
+    @consumer ||= OpenID::Consumer.new(session, store) 
+  end  
 end
+
+
+## TemplateURI's are not followed by the openid gem - so we have to trick it
+class OpenID::Consumer::IdResHandler
+  def verify_discovery_results
+    oldid = @message.get_arg(OpenID::OPENID_NS, 'identity', nil)
+    @message.set_arg(OpenID::OPENID_NS, 'identity', GoogleAppsAuth::XRDS_PREFIX + oldid)
+    @message.set_arg(OpenID::OPENID_NS, 'claimed_id', GoogleAppsAuth::XRDS_PREFIX + oldid)
+    verify_discovery_results_openid2
+    @message.set_arg(OpenID::OPENID_NS, 'identity', oldid)
+    @message.set_arg(OpenID::OPENID_NS, 'claimed_id', oldid)
+  end
+end
+
+
