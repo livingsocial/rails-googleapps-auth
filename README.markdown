@@ -49,7 +49,7 @@ Additionally, a memory store is used by default, but if you will have many users
 
         ...
 
-	protected
+        protected
         def store
             OpenID::Store::Memcache.new(MemCache.new('localhost:11211'))
             # or OpenID::Store::Filesystem.new(Rails.root.join('tmp/openids'))
