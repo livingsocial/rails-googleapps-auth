@@ -6,7 +6,7 @@ when dealing with authenticating against Google's Apps-For-Your-Domain accounts,
 # Usage
 ## Installation 
 First, install https://github.com/openid/ruby-openid:
-       gem install openid
+       gem install ruby-openid
 
 
 Then, checkout this repo into your vendors/plugins dir:
@@ -28,7 +28,7 @@ Create a new controller.
             if response.failed? or response.canceled?
                 flash[:notice] = "Could not authenticate: #{response.error}"
             else   
-	        # start a session, log user in
+                # start a session, log user in
                 session[:user] = response[:email]
                 flash[:notice] = "Thanks for logging in, #{response[:email]}"
             end
@@ -41,7 +41,7 @@ add routes for your two actions in your *config/routes.rb* file:
      map.resources :auth, :collection => { :login => :get, :finish => :get }
 
 Additionally, a memory store is used by default, but if you will have many users authenticating you should use a different 
-**OpenID::Store** by adding a *store* protected method to your controller:
+[OpenID::Store](https://github.com/openid/ruby-openid/tree/master/lib/openid/store/) by adding a *store* protected method to your controller:
 
     require 'openid/store/memory' # or 'openid/store/filesystem'
 
@@ -58,6 +58,7 @@ Additionally, a memory store is used by default, but if you will have many users
 # Further Reading
  * [Google's docs on OpenID discovery for hosted domains](http://groups.google.com/group/google-federated-login-api/web/openid-discovery-for-hosted-domains)
  * [Google's docs on OpenID for general accounts](http://code.google.com/apis/accounts/docs/OpenID.html)
+ * [ruby-openid gem](https://github.com/openid/ruby-openid)
 
 
 # Alternative
