@@ -28,9 +28,9 @@ Create a new controller.
             if response.failed? or response.canceled?
                 flash[:notice] = "Could not authenticate: #{response.error}"
             else   
-                # start a session, log user in
-                session[:user] = response[:email]
-                flash[:notice] = "Thanks for logging in, #{response[:email]}"
+                # start a session, log user in.  AX values are arrays, get first.
+                session[:user] = response[:email].first
+                flash[:notice] = "Thanks for logging in, #{response[:email].first}"
             end
             redirect_to :root_url
         end
