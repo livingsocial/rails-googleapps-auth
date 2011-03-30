@@ -1,3 +1,5 @@
+require "railtie" if defined?(Rails)
+
 require 'openid'
 require 'openid/store/memory'
 require 'openid/extensions/ax'
@@ -5,7 +7,7 @@ require 'openid/extensions/ax'
 module GoogleAppsAuth
   ID_PREFIX = "https://www.google.com/accounts/o8/site-xrds?hd="
   XRDS_PREFIX = "https://www.google.com/accounts/o8/user-xrds?uri="
-  AX_SCHEMAS = { 
+  AX_SCHEMAS = {
     :email => "http://schema.openid.net/contact/email",
     :firstname => "http://axschema.org/namePerson/first",
     :lastname => "http://axschema.org/namePerson/last",
@@ -20,24 +22,24 @@ module GoogleAppsAuth
       @attrs = attrs
       @attrs ||= {}
     end
-    
+
     def [](attr)
       @attrs[attr]
     end
-    
+
     def succeeded?
       @status == :success
     end
-    
+
     def canceled?
       @status == :canceled
     end
-    
+
     def failed?
       @status == :failed
     end
   end
- 
+
 
   protected
   def google_apps_authenticate(appname, return_action = 'finish', get_attrs = nil)
@@ -72,7 +74,7 @@ module GoogleAppsAuth
     when OpenID::Consumer::SUCCESS
       resp = OpenID::AX::FetchResponse.from_success_response(oidresp)
       attrs = {}
-      GoogleAppsAuth::AX_SCHEMAS.each { |name,schema| 
+      GoogleAppsAuth::AX_SCHEMAS.each { |name,schema|
         attrs[name] = resp.data[schema] if not resp.data[schema].nil?
       }
       GoogleAppsAuth::Result.new :success, nil, attrs
@@ -86,8 +88,8 @@ module GoogleAppsAuth
   end
 
   def consumer
-    @consumer ||= OpenID::Consumer.new(session, store) 
-  end  
+    @consumer ||= OpenID::Consumer.new(session, store)
+  end
 end
 
 

@@ -1,6 +1,6 @@
 require 'googleapps_auth'
 
-config.gem 'memcache-client', :lib => 'memcache'
+config.gem "ruby-openid", :lib => "2.1.8"
 
 config.after_initialize do
   ActionController::Base.send :include, GoogleAppsAuth
