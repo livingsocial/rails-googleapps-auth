@@ -11,6 +11,6 @@ Gem::Specification.new do |gem|
 
   gem.add_dependency("ruby-openid", ["= 2.1.8"])
 
-  gem.files = Dir["{lib}/**/*", "README", "LICENSE"]
+  gem.files = Dir["{lib}/**/*", "README", "LICENSE", "Gemfile"]
 end
 

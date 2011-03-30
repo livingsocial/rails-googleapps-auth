@@ -1,4 +1,4 @@
-require "railtie" if defined?(Rails)
+require "railtie" if defined?(::Rails::Railtie)
 
 require 'openid'
 require 'openid/store/memory'
