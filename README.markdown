@@ -1,24 +1,24 @@
 # Rails-GoogleApps-Auth
 rails-googleapps-auth is a Rails plugin for OpenID auth against Google apps for your domain accounts.  There are a few unique issues
-when dealing with authenticating against Google's Apps-For-Your-Domain accounts, which is why this plugin was created (instead of using 
-[a more general plugin](https://github.com/rails/open_id_authentication)).  
+when dealing with authenticating against Google's Apps-For-Your-Domain accounts, which is why this plugin was created (instead of using
+[a more general plugin](https://github.com/rails/open_id_authentication)).
 
 # Usage
-## Installation 
-First, install https://github.com/openid/ruby-openid:
-       gem install ruby-openid
+## Installation
 
+### Gem
+  gem "googleapps-auth", "0.0.1", :git => "git://github.com/livingsocial/rails-googleapps-auth.git", :require => "googleapps_auth"
 
+### Plugin
 Then, checkout this repo into your vendors/plugins dir:
-      git clone git://github.com/livingsocial/rails-googleapps-auth.git vendors/plugins/rails-googleapps-auth
-
+  script/rails plugin git://github.com/livingsocial/rails-googleapps-auth.git
 
 ## Authenticating Users
 Create a new controller.
     class AuthController < ApplicationController
         def login
             # user will immediately be redirected to google to log in.
-            # args are 1) your domain, 2) your "finish" controller action, and 
+            # args are 1) your domain, 2) your "finish" controller action, and
             # 3) any required ax params (email/firstname/lastname/language)
             google_apps_authenticate "hungrymachine.com", 'finish', [:email]
         end
@@ -27,7 +27,7 @@ Create a new controller.
             response = google_apps_handle_auth
             if response.failed? or response.canceled?
                 flash[:notice] = "Could not authenticate: #{response.error}"
-            else   
+            else
                 # start a session, log user in.  AX values are arrays, get first.
                 session[:user] = response[:email].first
                 flash[:notice] = "Thanks for logging in, #{response[:email].first}"
@@ -36,11 +36,11 @@ Create a new controller.
         end
     end
 
-To log users in, just redirect them to your controller's **login** action.  Additionally, you will need to 
+To log users in, just redirect them to your controller's **login** action.  Additionally, you will need to
 add routes for your two actions in your *config/routes.rb* file:
      map.resources :auth, :collection => { :login => :get, :finish => :get }
 
-Additionally, a memory store is used by default, but if you will have many users authenticating you should use a different 
+Additionally, a memory store is used by default, but if you will have many users authenticating you should use a different
 [OpenID::Store](https://github.com/openid/ruby-openid/tree/master/lib/openid/store/) by adding a *store* protected method to your controller:
 
     require 'openid/store/memory' # or 'openid/store/filesystem'
