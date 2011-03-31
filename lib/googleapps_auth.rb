@@ -40,7 +40,6 @@ module GoogleAppsAuth
     end
   end
 
-
   protected
   def google_apps_authenticate(appname, return_action = 'finish', get_attrs = nil)
     get_attrs ||= []
@@ -55,8 +54,12 @@ module GoogleAppsAuth
       oidreq.add_extension(ax)
       redirect_to oidreq.redirect_url(realm, return_to, false)
     rescue OpenID::OpenIDError => e
-      flash[:notice] = "Discovery failed."
-      redirect_to :action => 'index'
+      if block_given?
+        yield
+      else
+        flash[:notice] = "Discovery failed."
+        redirect_to :action => 'index'
+      end
     end
   end
 
