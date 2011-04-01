@@ -65,8 +65,8 @@ module GoogleAppsAuth
 
 
   def google_apps_handle_auth
-    current_url = url_for(:action => request.path_parameters['action'], :only_path => false)
-    parameters = params.reject{ |k,v| request.path_parameters[k] }
+    current_url = url_for(:action => request.symbolized_path_parameters[:action], :only_path => false)
+    parameters = params.reject { |k, v| request.symbolized_path_parameters[k.to_sym] }
     oidresp = consumer.complete(parameters, current_url)
 
     case oidresp.status
