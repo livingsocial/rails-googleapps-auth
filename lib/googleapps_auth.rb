@@ -14,6 +14,10 @@ module GoogleAppsAuth
     :language => "http://axschema.org/pref/language"
   }
 
+  def self.certificate_authority_file=(path)
+    OpenID.fetcher.ca_file = path
+  end
+
   class Result
     attr_reader :error
     def initialize(status, error=nil, attrs=nil)
