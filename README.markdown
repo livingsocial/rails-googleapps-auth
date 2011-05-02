@@ -13,6 +13,18 @@ when dealing with authenticating against Google's Apps-For-Your-Domain accounts,
 Then, checkout this repo into your vendors/plugins dir:
   script/rails plugin git://github.com/livingsocial/rails-googleapps-auth.git
 
+## Configuration
+The path to a certificate file _must_ be configured before you start making requests to Google Apps. Due to
+short comings of net/https, the default behavior is to silently fallback to VERIFY_NONE when faced with a ssl cert.
+
+This is bad for many reasons but most notably, it can fall prey to man-in-the middle attacks.
+
+The following line in a rails initializer will enable the plugin for use:
+
+  GoogleAppsAuth.certificate_authority_file = File.join(::Rails.root, "file.pem")
+
+Otherwise the authetication methods will raise GoogleAppsAuth::CertificateAuthorityFileError errors.
+
 ## Authenticating Users
 Create a new controller.
     class AuthController < ApplicationController
