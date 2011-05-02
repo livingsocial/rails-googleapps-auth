@@ -2,7 +2,7 @@ Gem::Specification.new do |gem|
   gem.name    = "googleapps-auth"
   gem.summary = "Google Apps Auth Provider for Rails"
   gem.description = "Use Google Apps as an Authentication Provider"
-  gem.version = "0.0.4"
+  gem.version = "0.0.5"
   gem.date    = "11/17/2010"
 
   gem.authors  = ["Brian Muller"]
