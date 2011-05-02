@@ -18,6 +18,10 @@ module GoogleAppsAuth
     OpenID.fetcher.ca_file = path
   end
 
+  def self.certificate_authority_file?
+    !! OpenID.fetcher.ca_file
+  end
+
   class Result
     attr_reader :error
     def initialize(status, error=nil, attrs=nil)
@@ -44,8 +48,12 @@ module GoogleAppsAuth
     end
   end
 
+  class CertificateAuthorityFileError < StandardError; end
+
   protected
   def google_apps_authenticate(appname, return_action = 'finish', get_attrs = nil)
+    assert_certificate_authority_file_present!
+
     get_attrs ||= []
     begin
       oidreq = consumer.begin GoogleAppsAuth::ID_PREFIX + appname
@@ -69,6 +77,8 @@ module GoogleAppsAuth
 
 
   def google_apps_handle_auth
+    assert_certificate_authority_file_present!
+
     current_url = url_for(:action => request.symbolized_path_parameters[:action], :only_path => false)
     parameters = params.reject { |k, v| request.symbolized_path_parameters[k.to_sym] }
     oidresp = consumer.complete(parameters, current_url)
@@ -96,6 +106,13 @@ module GoogleAppsAuth
 
   def consumer
     @consumer ||= OpenID::Consumer.new(session, store)
+  end
+
+  def assert_certificate_authority_file_present!
+    unless GoogleAppsAuth.certificate_authority_file?
+      raise CertificateAuthorityFileError,
+        "Configure a CA file through GoogleAppsAuth.certificate_authority_file="
+    end
   end
 end
 
