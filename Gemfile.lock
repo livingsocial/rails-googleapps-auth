@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    googleapps-auth (0.0.5)
+    googleapps-auth (0.0.6)
       actionpack (>= 2.3.5)
       ruby-openid (= 2.1.8)
 
