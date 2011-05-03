@@ -116,7 +116,6 @@ module GoogleAppsAuth
   end
 end
 
-
 ## TemplateURI's are not followed by the openid gem - so we have to trick it
 class OpenID::Consumer::IdResHandler
   def verify_discovery_results
@@ -128,5 +127,3 @@ class OpenID::Consumer::IdResHandler
     @message.set_arg(OpenID::OPENID_NS, 'claimed_id', oldid)
   end
 end
-
-
