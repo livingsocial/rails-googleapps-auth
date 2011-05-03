@@ -27,8 +27,7 @@ module GoogleAppsAuth
     def initialize(status, error=nil, attrs=nil)
       @status = status
       @error = error
-      @attrs = attrs
-      @attrs ||= {}
+      @attrs = attrs || {}
     end
 
     def [](attr)

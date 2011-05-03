@@ -1,9 +1,9 @@
-require File.dirname(__FILE__) + "/spec_helper"
+require File.dirname(__FILE__) + "/../spec_helper"
 
 describe GoogleAppsAuth do
 
   let :ca_file do
-    File.join(File.dirname(__FILE__), "cacert.pem")
+    File.join(File.dirname(__FILE__), "..", "cacert.pem")
   end
 
   describe "when setting the certificate_authority_file property" do
