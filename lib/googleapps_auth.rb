@@ -112,9 +112,14 @@ module GoogleAppsAuth
   end
 
   def assert_certificate_authority_file_present!
-    if !GoogleAppsAuth.certificate_authority_file? || !File.exists?(GoogleAppsAuth.certificate_authority_file)
+    unless GoogleAppsAuth.certificate_authority_file?
       raise CertificateAuthorityFileError,
         "Configure a CA file through GoogleAppsAuth.certificate_authority_file="
+    end
+
+    unless File.exists?(GoogleAppsAuth.certificate_authority_file)
+      raise CertificateAuthorityFileError,
+        "GoogleAppsAuth.certificate_authority_file= is a non-existent file"
     end
   end
 end

@@ -17,6 +17,11 @@ describe GoogleAppsAuth do
       OpenID.fetcher.should_receive(:ca_file=).with(ca_file)
       GoogleAppsAuth.certificate_authority_file = ca_file
     end
+
+    it "should know its value" do
+      GoogleAppsAuth.certificate_authority_file = ca_file
+      GoogleAppsAuth.certificate_authority_file.should eql(ca_file)
+    end
   end
 
   describe "when not setting the certificate_authority_file property" do
@@ -29,6 +34,11 @@ describe GoogleAppsAuth do
     it "should set the underlying openid ca_file value" do
       OpenID.fetcher.should_receive(:ca_file=).with(nil)
       GoogleAppsAuth.certificate_authority_file = nil
+    end
+
+    it "should know its value is nil" do
+      GoogleAppsAuth.certificate_authority_file = nil
+      GoogleAppsAuth.certificate_authority_file.should be_nil
     end
   end
 
