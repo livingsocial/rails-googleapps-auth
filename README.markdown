@@ -7,11 +7,13 @@ when dealing with authenticating against Google's Apps-For-Your-Domain accounts,
 ## Installation
 
 ### Gem
-  gem "googleapps-auth", "0.0.1", :git => "git://github.com/livingsocial/rails-googleapps-auth.git", :require => "googleapps_auth"
+
+    gem "googleapps-auth", "0.0.5", :git => "git://github.com/livingsocial/rails-googleapps-auth.git", :require => "googleapps_auth"
 
 ### Plugin
 Then, checkout this repo into your vendors/plugins dir:
-  script/rails plugin git://github.com/livingsocial/rails-googleapps-auth.git
+
+    script/rails plugin git://github.com/livingsocial/rails-googleapps-auth.git
 
 ## Configuration
 The path to a certificate file _must_ be configured before you start making requests to Google Apps. Due to
@@ -21,12 +23,13 @@ This is bad for many reasons but most notably, it can fall prey to man-in-the mi
 
 The following line in a rails initializer will enable the plugin for use:
 
-  GoogleAppsAuth.certificate_authority_file = File.join(::Rails.root, "file.pem")
+    GoogleAppsAuth.certificate_authority_file = File.join(::Rails.root, "file.pem")
 
 Otherwise the authetication methods will raise GoogleAppsAuth::CertificateAuthorityFileError errors.
 
 ## Authenticating Users
 Create a new controller.
+
     class AuthController < ApplicationController
         def login
             # user will immediately be redirected to google to log in.
@@ -50,7 +53,8 @@ Create a new controller.
 
 To log users in, just redirect them to your controller's **login** action.  Additionally, you will need to
 add routes for your two actions in your *config/routes.rb* file:
-     map.resources :auth, :collection => { :login => :get, :finish => :get }
+
+    map.resources :auth, :collection => { :login => :get, :finish => :get }
 
 Additionally, a memory store is used by default, but if you will have many users authenticating you should use a different
 [OpenID::Store](https://github.com/openid/ruby-openid/tree/master/lib/openid/store/) by adding a *store* protected method to your controller:

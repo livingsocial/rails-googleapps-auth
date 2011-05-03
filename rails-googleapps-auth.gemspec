@@ -1,9 +1,12 @@
+require "lib/version"
+require "date"
+
 Gem::Specification.new do |gem|
   gem.name         = "googleapps-auth"
   gem.summary      = "Google Apps Auth Provider for Rails"
   gem.description  = "Use Google Apps as an Authentication Provider"
-  gem.version      = "0.0.5"
-  gem.date         = "11/17/2010"
+  gem.version      = GoogleAppsAuth::VERSION
+  gem.date         = Date.today.to_s
 
   gem.authors      = ["Brian Muller"]
   gem.email        = "brian.muller@livingsocial.com"
