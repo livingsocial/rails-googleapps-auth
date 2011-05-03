@@ -22,6 +22,10 @@ module GoogleAppsAuth
     !! OpenID.fetcher.ca_file
   end
 
+  def self.certificate_authority_file
+    OpenID.fetcher.ca_file
+  end
+
   class Result
     attr_reader :error
     def initialize(status, error=nil, attrs=nil)
@@ -108,7 +112,7 @@ module GoogleAppsAuth
   end
 
   def assert_certificate_authority_file_present!
-    unless GoogleAppsAuth.certificate_authority_file?
+    if !GoogleAppsAuth.certificate_authority_file? || !File.exists?(GoogleAppsAuth.certificate_authority_file)
       raise CertificateAuthorityFileError,
         "Configure a CA file through GoogleAppsAuth.certificate_authority_file="
     end

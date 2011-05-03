@@ -14,6 +14,14 @@ describe SessionsController, :type => :controller do
 
     end
 
+    describe "and an incorrect path is passed" do
+      it "should raise" do
+       GoogleAppsAuth.certificate_authority_file = "daksjdkasjkdjsakldjksa"
+
+       lambda { get :start }.should raise_error(GoogleAppsAuth::CertificateAuthorityFileError)
+      end
+    end
+
   end
 
 end

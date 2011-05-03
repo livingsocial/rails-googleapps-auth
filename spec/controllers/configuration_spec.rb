@@ -31,5 +31,6 @@ describe GoogleAppsAuth do
       GoogleAppsAuth.certificate_authority_file = nil
     end
   end
+
 end
 
