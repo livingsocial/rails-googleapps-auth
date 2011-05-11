@@ -4,7 +4,9 @@ $LOAD_PATH.unshift(File.expand_path(File.join(File.dirname(__FILE__), "..", "lib
 require "action_controller/railtie"
 
 module GoogleAppsAuth
-  class Application < ::Rails::Application; end
+  class Application < ::Rails::Application
+    config.active_support.deprecation = :log
+  end
 end
 
 GoogleAppsAuth::Application.initialize!
