@@ -69,6 +69,8 @@ module GoogleAppsAuth
       oidreq.add_extension(ax)
       redirect_to oidreq.redirect_url(realm, return_to, false)
     rescue OpenID::OpenIDError => e
+      Rails.logger.error "ERROR: #{e.inspect}" if defined?(Rails)
+
       if block_given?
         yield
       else
