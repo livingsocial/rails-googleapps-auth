@@ -1,1 +1,1 @@
-rvm ree@rails-googleapps-auth
+rvm --create ree@rails-googleapps-auth
