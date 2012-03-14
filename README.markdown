@@ -13,7 +13,7 @@ when dealing with authenticating against Google's Apps-For-Your-Domain accounts,
 ### Plugin
 Then, checkout this repo into your vendors/plugins dir:
 
-    script/rails plugin git://github.com/livingsocial/rails-googleapps-auth.git
+    script/rails plugin install git://github.com/livingsocial/rails-googleapps-auth.git
 
 ## Configuration
 The path to a certificate file _must_ be configured before you start making requests to Google Apps. Due to
