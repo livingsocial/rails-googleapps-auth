@@ -1,4 +1,4 @@
-require "lib/googleapps_auth/version"
+require "./lib/googleapps_auth/version"
 require "date"
 
 Gem::Specification.new do |gem|
