@@ -54,7 +54,12 @@ Create a new controller.
 To log users in, just redirect them to your controller's **login** action.  Additionally, you will need to
 add routes for your two actions in your *config/routes.rb* file:
 
-    resources :auth, :collection => { :login => :get, :finish => :get }
+    resources :auth do
+      collection do
+        get 'login'
+        get 'finish'
+      end
+    end
 
 Additionally, a memory store is used by default, but if you will have many users authenticating you should use a different
 [OpenID::Store](https://github.com/openid/ruby-openid/tree/master/lib/openid/store/) by adding a *store* protected method to your controller:
