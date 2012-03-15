@@ -8,7 +8,7 @@ when dealing with authenticating against Google's Apps-For-Your-Domain accounts,
 
 ### Gem
 
-    gem "googleapps-auth", "0.0.5", :git => "git://github.com/livingsocial/rails-googleapps-auth.git", :require => "googleapps_auth"
+    gem "googleapps-auth", "0.0.7.sodabrew", :git => "git://github.com/sodabrew/rails-googleapps-auth.git", :require => "googleapps_auth"
 
 ## Configuration
 The path to a certificate file _must_ be configured before you start making requests to Google Apps. Due to
@@ -22,19 +22,32 @@ The following line in a rails initializer will enable the plugin for use:
 
 Otherwise the authetication methods will raise GoogleAppsAuth::CertificateAuthorityFileError errors.
 
+To set your Google Apps domain for all instances at initialization, rather than at call time, use:
+
+    GoogleAppsAuth.default_domain = "example.com"
+
+If you do not specify an Apps domain either via default_domain, or by the
+:domain argument to google_apps_auth_begin, you'll be prompted by Google to
+select which of your accounts to sign in with. This will allow users to log
+into your Rails app using either their Google account or ANY Google Apps domain
+account.
+
 ## Authenticating Users
 Create a new controller.
 
     class AuthController < ApplicationController
         def login
-            # user will immediately be redirected to google to log in.
-            # args are 1) your domain, 2) your "finish" controller action, and
-            # 3) any required ax params (email/firstname/lastname/language)
-            google_apps_authenticate "hungrymachine.com", 'finish', [:email]
+            # User will immediately be redirected to Google to log in, and redirected back to the 'finish' action when done.
+
+	    # Override defaults:
+            google_apps_auth_begin :domain => "example.com", :return_action => 'finish', :attrs => [:email]
+
+            # Or use no args at all (domain defaults to nil, return_action defaults to 'finish')
+            # google_apps_auth_begin
         end
 
         def finish
-            response = google_apps_handle_auth
+            response = google_apps_auth_finish
             if response.failed? or response.canceled?
                 flash[:notice] = "Could not authenticate: #{response.error}"
             else

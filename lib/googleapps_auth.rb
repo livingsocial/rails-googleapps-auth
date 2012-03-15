@@ -5,14 +5,17 @@ require 'openid/store/memory'
 require 'openid/extensions/ax'
 
 module GoogleAppsAuth
-  ID_PREFIX = "https://www.google.com/accounts/o8/site-xrds?hd="
-  XRDS_PREFIX = "https://www.google.com/accounts/o8/user-xrds?uri="
+  ID_PREFIX = "https://www.google.com/accounts/o8/id"
+  DOMAIN_ID_PREFIX = "https://www.google.com/accounts/o8/site-xrds?hd="
+  DOMAIN_XRDS_PREFIX = "https://www.google.com/accounts/o8/user-xrds?uri="
   AX_SCHEMAS = {
     :email => "http://schema.openid.net/contact/email",
     :firstname => "http://axschema.org/namePerson/first",
     :lastname => "http://axschema.org/namePerson/last",
-    :language => "http://axschema.org/pref/language"
+    :language => "http://axschema.org/pref/language",
+    :country => "http://axschema.org/contact/country/home",
   }
+  @@default_domain = nil
 
   def self.certificate_authority_file=(path)
     OpenID.fetcher.ca_file = path
@@ -24,6 +27,14 @@ module GoogleAppsAuth
 
   def self.certificate_authority_file
     OpenID.fetcher.ca_file
+  end
+
+  def self.default_domain=(domain)
+    @@default_domain = domain
+  end
+
+  def self.default_domain
+    @@default_domain
   end
 
   class Result
@@ -54,16 +65,28 @@ module GoogleAppsAuth
   class CertificateAuthorityFileError < StandardError; end
 
   protected
-  def google_apps_authenticate(appname, return_action = 'finish', get_attrs = nil)
+
+  ##
+  # return_to::
+  # return_action::
+  # domain::
+  # attrs:: zero or more of [ :email, :firstname, :lastname, :language ]
+  def google_apps_auth_begin(opts={})
     assert_certificate_authority_file_present!
 
-    get_attrs ||= []
+    opts = {
+      :return_action => 'finish',
+      :return_to => nil,
+      :domain => GoogleAppsAuth.default_domain,
+      :attrs => []
+    }.merge(opts)
+
     begin
-      oidreq = consumer.begin GoogleAppsAuth::ID_PREFIX + appname
-      return_to = url_for :action => return_action, :only_path => false
+      oidreq = consumer.begin opts[:domain] ? GoogleAppsAuth::DOMAIN_ID_PREFIX + opts[:domain] : GoogleAppsAuth::ID_PREFIX
+      return_to = opts[:return_to] || url_for(:action => opts[:return_action], :only_path => false)
       realm = request.protocol + request.host_with_port
       ax = OpenID::AX::FetchRequest.new
-      get_attrs.each { |attr|
+      opts[:attrs].each { |attr|
         ax.add OpenID::AX::AttrInfo.new(GoogleAppsAuth::AX_SCHEMAS[attr], attr.to_s, true)
       }
       oidreq.add_extension(ax)
@@ -80,8 +103,7 @@ module GoogleAppsAuth
     end
   end
 
-
-  def google_apps_handle_auth
+  def google_apps_auth_finish
     assert_certificate_authority_file_present!
 
     current_url = url_for(:action => request.symbolized_path_parameters[:action], :only_path => false)
@@ -127,13 +149,20 @@ module GoogleAppsAuth
 end
 
 ## TemplateURI's are not followed by the openid gem - so we have to trick it
+## when we're in private domain mode.
 class OpenID::Consumer::IdResHandler
-  def verify_discovery_results
+  original_verify_discovery_results = instance_method(:verify_discovery_results)
+
+  define_method(:verify_discovery_results) do
     oldid = @message.get_arg(OpenID::OPENID_NS, 'identity', nil)
-    @message.set_arg(OpenID::OPENID_NS, 'identity', GoogleAppsAuth::XRDS_PREFIX + oldid)
-    @message.set_arg(OpenID::OPENID_NS, 'claimed_id', GoogleAppsAuth::XRDS_PREFIX + oldid)
-    verify_discovery_results_openid2
-    @message.set_arg(OpenID::OPENID_NS, 'identity', oldid)
-    @message.set_arg(OpenID::OPENID_NS, 'claimed_id', oldid)
+    if oldid =~ /google.com\/accounts/
+      original_verify_discovery_results.bind(self).call
+    else
+      @message.set_arg(OpenID::OPENID_NS, 'identity', GoogleAppsAuth::DOMAIN_XRDS_PREFIX + oldid)
+      @message.set_arg(OpenID::OPENID_NS, 'claimed_id', GoogleAppsAuth::DOMAIN_XRDS_PREFIX + oldid)
+      verify_discovery_results_openid2
+      @message.set_arg(OpenID::OPENID_NS, 'identity', oldid)
+      @message.set_arg(OpenID::OPENID_NS, 'claimed_id', oldid)
+    end
   end
 end
