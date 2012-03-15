@@ -10,11 +10,6 @@ when dealing with authenticating against Google's Apps-For-Your-Domain accounts,
 
     gem "googleapps-auth", "0.0.5", :git => "git://github.com/livingsocial/rails-googleapps-auth.git", :require => "googleapps_auth"
 
-### Plugin
-Then, checkout this repo into your vendors/plugins dir:
-
-    script/rails plugin install git://github.com/livingsocial/rails-googleapps-auth.git
-
 ## Configuration
 The path to a certificate file _must_ be configured before you start making requests to Google Apps. Due to
 short comings of net/https, the default behavior is to silently fallback to VERIFY_NONE when faced with a ssl cert.
@@ -77,6 +72,40 @@ Additionally, a memory store is used by default, but if you will have many users
         end
     end
 
+##Requiring Authentication in Controllers
+To require that a user is authentication in order to perform certain actions, add the following helpers to ApplicationController:
+
+    class ApplicationController < ActionController::Base
+    
+    ...
+    
+        def login_required
+            if session[:user]
+                return true
+            end
+            flash[:warning] = 'Login required.'
+            session[:return_to] = request.fullpath
+            redirect_to :controller => "auth", :action => "login"
+            return false
+        end
+
+        def current_user
+            session[:user]
+        end
+    end
+    
+Then at the top of each controller, specify the actions you wish to protect -- pick just one of the following *before_filter* for each controller:
+
+    class YourController < ApplicationController
+        # Protect every action in this controller
+        before_filter :login_required
+        
+        # Protect just these actions
+        before_filter :login_required, :only => [:monkeywith]
+        
+        # Protect everything else, but allow these to be unauthenticated
+        before_filter :login_required, :except => [:justlooking]
+    end
 
 # Further Reading
  * [Google's docs on OpenID discovery for hosted domains](http://groups.google.com/group/google-federated-login-api/web/openid-discovery-for-hosted-domains)
