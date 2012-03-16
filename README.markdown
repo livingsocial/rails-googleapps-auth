@@ -46,6 +46,11 @@ Create a new controller.
             # google_apps_auth_begin
         end
 
+	def logout
+	    reset_session
+	    redirect_to :back
+	end
+
         def finish
             response = google_apps_auth_finish
             if response.failed? or response.canceled?
@@ -55,7 +60,7 @@ Create a new controller.
                 session[:user] = response[:email].first
                 flash[:notice] = "Thanks for logging in, #{response[:email].first}"
             end
-            redirect_to :root_url
+            redirect_to :back
         end
     end
 
@@ -65,6 +70,7 @@ add routes for your two actions in your *config/routes.rb* file:
     resources :auth do
       collection do
         get 'login'
+        get 'logout'
         get 'finish'
       end
     end
