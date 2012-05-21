@@ -16,6 +16,7 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency("ruby-openid", ["= 2.1.8"])
 
   gem.add_development_dependency("activesupport", ["~> 3.0"])
+  gem.add_development_dependency("tzinfo", [">= 0.3"])
   gem.add_development_dependency("actionpack", ["~> 3.0"])
   gem.add_development_dependency("activemodel", ["~> 3.0"])
   gem.add_development_dependency("railties", ["~> 3.0"])
