@@ -8,7 +8,7 @@ when dealing with authenticating against Google's Apps-For-Your-Domain accounts,
 
 ### Gem
 
-    gem "googleapps-auth", "0.0.7.sodabrew", :git => "git://github.com/sodabrew/rails-googleapps-auth.git", :require => "googleapps_auth"
+    gem "googleapps-auth", "0.1.0", :require => "googleapps_auth"
 
 ## Configuration
 The path to a certificate file _must_ be configured before you start making requests to Google Apps. Due to
