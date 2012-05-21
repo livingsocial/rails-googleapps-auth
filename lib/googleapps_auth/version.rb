@@ -1,3 +1,3 @@
 module GoogleAppsAuth
-  VERSION = "0.0.7.sodabrew"
+  VERSION = "0.1.0"
 end
