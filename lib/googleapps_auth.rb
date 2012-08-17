@@ -118,9 +118,13 @@ module GoogleAppsAuth
     when OpenID::Consumer::SUCCESS
       resp = OpenID::AX::FetchResponse.from_success_response(oidresp)
       attrs = {}
-      GoogleAppsAuth::AX_SCHEMAS.each { |name,schema|
-        attrs[name] = resp.data[schema] if not resp.data[schema].nil?
-      }
+
+      if resp.respond_to? :data
+        GoogleAppsAuth::AX_SCHEMAS.each { |name,schema|
+          attrs[name] = resp.data[schema] if not resp.data[schema].nil?
+        }
+      end
+
       GoogleAppsAuth::Result.new :success, nil, attrs
     else
       GoogleAppsAuth::Result.new :failed, "Unknown error."
