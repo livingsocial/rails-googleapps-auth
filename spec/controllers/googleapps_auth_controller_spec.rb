@@ -48,11 +48,11 @@ describe SessionsController, :type => :controller do
 
     describe "when completing the auth sequence from a correct google apps domain" do
 
-      it "should return a success result when " do
+      it "should return a success result when data attributes were returned" do
         status_response = double(:status_response, {:status => OpenID::Consumer::SUCCESS})
         controller.__send__(:consumer).stub!(:complete).and_return(status_response)
 
-        oid_response = double(:oid_response, {:data => {}})
+        oid_response = double(:oid_response, {:data => {"http://schema.openid.net/contact/email"=>["email@example.com"]}})
         OpenID::AX::FetchResponse.stub!(:from_success_response).and_return(oid_response)
 
         get :conclude
@@ -60,6 +60,17 @@ describe SessionsController, :type => :controller do
         response.should be_success
       end
 
+      it "should return a success result when data attributes were not returned" do
+        status_response = double(:status_response, {:status => OpenID::Consumer::SUCCESS})
+        controller.__send__(:consumer).stub!(:complete).and_return(status_response)
+
+        oid_response = double(:oid_response)
+        OpenID::AX::FetchResponse.stub!(:from_success_response).and_return(oid_response)
+
+        get :conclude
+
+        response.should be_success
+      end
     end
 
   end
