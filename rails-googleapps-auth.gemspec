@@ -13,7 +13,7 @@ Gem::Specification.new do |gem|
   gem.homepage     = "https://github.com/livingsocial/rails-googleapps-auth"
 
   gem.add_runtime_dependency("actionpack", [">= 2.3.5"])
-  gem.add_runtime_dependency("ruby-openid", ["~> 2.2.0"])
+  gem.add_runtime_dependency("ruby-openid", [">= 2.1.0"])
 
   gem.add_development_dependency("activesupport", ["~> 3.0"])
   gem.add_development_dependency("tzinfo", [">= 0.3"])
